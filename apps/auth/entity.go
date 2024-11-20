@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ardwiinoo/online-shop/infra/response"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Role string
@@ -68,4 +69,15 @@ func (a AuthEntity) ValidatePassword() (err error) {
 	}
 
 	return
+}
+
+func (a *AuthEntity) EncryptPassword(salt int) (err error) {
+	encryptedPass, err := bcrypt.GenerateFromPassword([]byte(a.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return
+	}
+
+	a.Password = string(encryptedPass)
+	return nil
 }
