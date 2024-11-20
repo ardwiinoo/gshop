@@ -32,7 +32,7 @@ func init() {
 func TestRegister_Success(t *testing.T) {
 	req := RegisterRequestPayload{
 		Email:    fmt.Sprintf("%v@gmail.id", uuid.NewString()),
-		Password: "secret",
+		Password: "mysupersecretpassword",
 	}
 	err := svc.register(context.Background(), req)
 	require.Nil(t, err)
