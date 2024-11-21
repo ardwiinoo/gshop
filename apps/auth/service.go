@@ -1,9 +1,15 @@
 package auth
 
-import "context"
+import (
+	"context"
+
+	"github.com/ardwiinoo/online-shop/infra/response"
+	"github.com/ardwiinoo/online-shop/internal/config"
+)
 
 type Respository interface{
 	CreateAuth(ctx context.Context, model AuthEntity) (err error)
+	GetAuthByEmail(ctx context.Context, email string) (model AuthEntity, err error)
 }
 
 type service struct {
@@ -18,9 +24,27 @@ func newService(repo Respository) service {
 
 func (s service) register(ctx context.Context, req RegisterRequestPayload) (err error) {
 	authEntity := NewFromRegisterRequest(req)
+	
 	if err = authEntity.Validate(); err != nil {
 		return
 	}
+
+	if err = authEntity.EncryptPassword(int(config.Cfg.App.Encryption.Salt)); err != nil {
+		return
+	}
+
+	model, err := s.repo.GetAuthByEmail(ctx, authEntity.Email)
+
+	if err != nil {
+		if err != response.ErrNotFound {
+			return
+		}
+	}
+
+	if model.IsExists() {
+		return response.ErrEmailAlreadyUsed
+	}
+
 
 	return s.repo.CreateAuth(ctx, authEntity)
 }
