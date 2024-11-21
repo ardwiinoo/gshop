@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/ardwiinoo/online-shop/external/database"
+	"github.com/ardwiinoo/online-shop/infra/response"
 	"github.com/ardwiinoo/online-shop/internal/config"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -36,4 +37,24 @@ func TestRegister_Success(t *testing.T) {
 	}
 	err := svc.register(context.Background(), req)
 	require.Nil(t, err)
+}
+
+func TestRegister_Fail(t *testing.T) {
+	t.Run("Error email already used", func(t *testing.T) {
+		// Prep
+		email := fmt.Sprintf("%v@gmail.id", uuid.NewString())
+
+		req := RegisterRequestPayload{
+			Email:    email,
+			Password: "mysupersecretpassword",
+		}
+
+		err := svc.register(context.Background(), req)
+		require.Nil(t, err)
+		// End Prep
+
+		err = svc.register(context.Background(), req)
+		require.NotNil(t, err)
+		require.Equal(t, response.ErrEmailAlreadyUsed, err)
+	})
 }
