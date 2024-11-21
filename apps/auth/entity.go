@@ -71,6 +71,10 @@ func (a AuthEntity) ValidatePassword() (err error) {
 	return
 }
 
+func (a AuthEntity) IsExists() bool { 
+	return a.Id != 0
+}
+
 func (a *AuthEntity) EncryptPassword(salt int) (err error) {
 	encryptedPass, err := bcrypt.GenerateFromPassword([]byte(a.Password), bcrypt.DefaultCost)
 
