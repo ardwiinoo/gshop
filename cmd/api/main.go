@@ -3,8 +3,10 @@ package main
 import (
 	"log"
 
+	"github.com/ardwiinoo/online-shop/apps/auth"
 	"github.com/ardwiinoo/online-shop/external/database"
 	"github.com/ardwiinoo/online-shop/internal/config"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -22,4 +24,13 @@ func main() {
 	if db != nil {
 		log.Println("db connected")
 	}
+
+	router := fiber.New(fiber.Config{
+		Prefork: true,
+		AppName: config.Cfg.App.Name,
+	})
+
+	auth.Init(router, db)
+
+	router.Listen(config.Cfg.App.Port)
 } 
