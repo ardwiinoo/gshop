@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/ardwiinoo/online-shop/infra/response"
+	"github.com/ardwiinoo/online-shop/utility"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,6 +20,7 @@ const (
 type AuthEntity struct {
 	Id       int   `db:"id"`
 	Email    string `db:"email"`
+	PublicId uuid.UUID `db:"public_id"`
 	Password string `db:"password"`
 	Role     Role  `db:"role"`
 	CreatedAt time.Time `db:"created_at"`
@@ -28,9 +31,17 @@ func NewFromRegisterRequest(req RegisterRequestPayload) AuthEntity {
 	return AuthEntity{
 		Email:    req.Email,
 		Password: req.Password,
+		PublicId: uuid.New(),
 		Role:     ROLE_USER,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+	}
+}
+
+func NewFromLoginRequest(req LoginRequestPayload) AuthEntity {
+	return AuthEntity{
+		Email:    req.Email,
+		Password: req.Password,
 	}
 }
 
@@ -84,4 +95,16 @@ func (a *AuthEntity) EncryptPassword(salt int) (err error) {
 
 	a.Password = string(encryptedPass)
 	return nil
+}
+
+func (a AuthEntity) VerifyPasswordFromEncrypted(plain string) (err error) {
+	return bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(plain))
+}
+
+func (a AuthEntity) VerifyPasswordFromPlain(encrypted string) (err error) {
+	return bcrypt.CompareHashAndPassword([]byte(encrypted), []byte(a.Password))
+}
+
+func (a AuthEntity) GenerateToken(secret string) (tokenString string, err error) {
+	return utility.GenerateToken(a.PublicId.String(), string(a.Role), secret)
 }
