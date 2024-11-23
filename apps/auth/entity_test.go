@@ -61,7 +61,7 @@ func TestValidateAuthEntity(t *testing.T) {
 
 		err := authEntity.Validate()
 		require.NotNil(t, err)
-		require.Equal(t, response.ErrPasswordLength, err)
+		require.Equal(t, response.ErrPasswordInvalidLength, err)
 	})
 }
 
