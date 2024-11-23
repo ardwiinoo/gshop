@@ -76,7 +76,7 @@ func (a AuthEntity) ValidatePassword() (err error) {
 	}
 
 	if len(a.Password) < 8 {
-		return response.ErrPasswordLength
+		return response.ErrPasswordInvalidLength
 	}
 
 	return
