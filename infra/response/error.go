@@ -15,4 +15,5 @@ var (
 	ErrAuthIsNotExists = errors.New("auth is not exists")
 	ErrAuthIsExists = errors.New("auth is exists")
 	ErrEmailAlreadyUsed = errors.New("email already used")
+	ErrPasswordNotMatch = errors.New("password not match")
 )
