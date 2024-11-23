@@ -21,9 +21,9 @@ func newRepository(db *sqlx.DB) repository {
 func (r repository) CreateAuth(ctx context.Context, model AuthEntity) (err error) {
 	query := `
 		INSERT INTO auth (
-			email, password, role, created_at, updated_at
+			email, password, role, created_at, updated_at, public_id
 		) VALUES (
-			:email, :password, :role, :created_at, :updated_at 
+			:email, :password, :role, :created_at, :updated_at, :public_id
 		)
 	`
 
@@ -42,7 +42,7 @@ func (r repository) CreateAuth(ctx context.Context, model AuthEntity) (err error
 func (r repository) GetAuthByEmail(ctx context.Context, email string) (model AuthEntity, err error) {
 	query := `
 		SELECT 
-			id, email, password, role, created_at, updated_at
+			id, email, password, role, created_at, updated_at, public_id
 		FROM auth
 		WHERE email=$1
 	`
