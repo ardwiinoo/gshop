@@ -9,6 +9,7 @@ import (
 type Repository interface{
 	CreateProduct(ctx context.Context, model Product) (err error)
 	GetAllProductsWithPaginationCursor(ctx context.Context, model ProductPagination) (products []Product, err error)
+	GetProductBySKU(ctx context.Context, sku string) (model Product, err error)
 }
 
 type service struct {
@@ -50,6 +51,16 @@ func (s service) ListProducts(ctx context.Context, req ListProductRequestPayload
 
 	if len(products) == 0 {
 		return []Product{}, nil
+	}
+
+	return
+}
+
+func (s service) ProductDetail(ctx context.Context, sku string) (model Product, err error) {
+	model, err = s.repo.GetProductBySKU(ctx, sku)
+
+	if err != nil {
+		return
 	}
 
 	return
