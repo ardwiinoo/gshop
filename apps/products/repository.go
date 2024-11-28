@@ -18,7 +18,6 @@ func newRepository(db *sqlx.DB) repository {
 	}
 }
 
-
 func (r repository) CreateProduct(ctx context.Context, model Product) (err error) {
 	query := `
 		INSERT INTO products (
@@ -53,12 +52,35 @@ func (r repository) GetAllProductsWithPaginationCursor(ctx context.Context, mode
 		ORDER BY id ASC
 		LIMIT $2
 	`
-	
+
 	err = r.db.SelectContext(ctx, &products, query, model.Cursor, model.Size)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, response.ErrNotFound
+		}
+
+		return
+	}
+
+	return
+}
+
+func (r repository) GetProductBySKU(ctx context.Context, sku string) (model Product, err error) {
+	query := `
+		SELECT
+			id, sku, name, stock, price, created_at, updated_at
+		FROM
+			products
+		WHERE sku=$1
+	`
+
+	err = r.db.GetContext(ctx, &model, query, sku)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = response.ErrNotFound
+			return
 		}
 
 		return
