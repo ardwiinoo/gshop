@@ -72,9 +72,12 @@ func (h handler) GetListProducts(ctx *fiber.Ctx) error {
 		).Send(ctx)
 	}
 
+	productListResponse := NewProductListResponseFromEntity(products)
+
 	return infrafiber.NewResponse(
 		infrafiber.WithHttpCode(http.StatusOK),
 		infrafiber.WithMessage("get list products success"),
-		infrafiber.WithPayload(products),
+		infrafiber.WithPayload(productListResponse),
+		infrafiber.WithQuery(req.GenerateDefaultValue()),
 	).Send(ctx)
 }
