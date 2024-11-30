@@ -7,8 +7,8 @@ type CreateProductRequestPayload struct {
 }
 
 type ListProductRequestPayload struct {
-	Cursor int `json:"cursor"`
-	Size   int `json:"size"`
+	Cursor int `query:"cursor"`
+	Size   int `query:"size"`
 }
 
 func (l ListProductRequestPayload) GenerateDefaultValue() ListProductRequestPayload {
