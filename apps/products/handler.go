@@ -36,7 +36,7 @@ func (h handler) CreateProduct(ctx *fiber.Ctx) error {
 		}
 
 		return infrafiber.NewResponse(
-			infrafiber.WithMessage("invalid payload"),
+			infrafiber.WithMessage(err.Error()),
 			infrafiber.WithError(myErr),
 		).Send(ctx)
 	}
@@ -67,7 +67,7 @@ func (h handler) GetListProducts(ctx *fiber.Ctx) error {
 		}
 
 		return infrafiber.NewResponse(
-			infrafiber.WithMessage("invalid payload"),
+			infrafiber.WithMessage(err.Error()),
 			infrafiber.WithError(myErr),
 		).Send(ctx)
 	}
@@ -79,5 +79,47 @@ func (h handler) GetListProducts(ctx *fiber.Ctx) error {
 		infrafiber.WithMessage("get list products success"),
 		infrafiber.WithPayload(productListResponse),
 		infrafiber.WithQuery(req.GenerateDefaultValue()),
+	).Send(ctx)
+}
+
+func (h handler) GetProductDetail(ctx *fiber.Ctx) error {
+	sku := ctx.Params("sku", "")
+
+	if sku == "" {
+		return infrafiber.NewResponse(
+			infrafiber.WithMessage("invalid payload"),
+			infrafiber.WithError(response.ErrorBadRequest),
+		).Send(ctx)
+	}
+
+	product, err := h.svc.ProductDetail(ctx.UserContext(), sku)
+
+	if err != nil {
+		myErr, ok := response.ErrorMapping[err.Error()]
+
+		if !ok {
+			myErr = response.ErrorGeneral
+		}
+
+		return infrafiber.NewResponse(
+			infrafiber.WithMessage(err.Error()),
+			infrafiber.WithError(myErr),
+		).Send(ctx)
+	}
+
+	productDetail := ProductDetailResponse {
+		Id: product.Id,
+		Name: product.Name,
+		SKU: product.SKU,
+		Stock: product.Stock,
+		Price: product.Price,
+		CreatedAt: product.CreatedAt,
+		UpdatedAt: product.UpdatedAt,
+	}
+
+	return infrafiber.NewResponse(
+		infrafiber.WithHttpCode(http.StatusOK),
+		infrafiber.WithMessage("get product detail success"),
+		infrafiber.WithPayload(productDetail),
 	).Send(ctx)
 }

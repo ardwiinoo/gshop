@@ -14,7 +14,13 @@ func NewProductListResponseFromEntity(products []Product) []ProductListResponse 
 	var productList = []ProductListResponse{}
 
 	for _, product := range products {
-		productList = append(productList, product.ToProductListResponse())
+		productList = append(productList, ProductListResponse{
+			Id: product.Id,
+			SKU: product.SKU,
+			Name: product.Name,
+			Stock: product.Stock,
+			Price: product.Price,
+		})
 	}
 
 	return productList
