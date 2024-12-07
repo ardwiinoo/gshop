@@ -1,4 +1,4 @@
-package products
+package product
 
 type CreateProductRequestPayload struct {
 	Name  string `json:"name"`
