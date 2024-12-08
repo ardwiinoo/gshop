@@ -23,6 +23,8 @@ var (
 	ErrProductNameInvalid = errors.New("product name must be at least 3 characters")
 	ErrStockInvalid = errors.New("stock must be greater than 0")
 	ErrPriceInvalid = errors.New("price must be greater than 0")
+	ErrAmountInvalid = errors.New("invalid amount")
+	ErrAmountGreaterThanStock = errors.New("amount greater than stock")
 )
 
 type Error struct {
@@ -58,6 +60,7 @@ var (
 	ErrorProductNameInvalid = NewError(ErrProductNameInvalid.Error(), "40006", http.StatusBadRequest)
 	ErrorStockInvalid = NewError(ErrStockInvalid.Error(), "40007", http.StatusBadRequest)
 	ErrorPriceInvalid = NewError(ErrPriceInvalid.Error(), "40008", http.StatusBadRequest)
+	ErrorInvalidAmount = NewError(ErrAmountInvalid.Error(), "40009", http.StatusBadRequest)
 
 	ErrorAuthIsNotExists = NewError(ErrAuthIsNotExists.Error(), "40401", http.StatusNotFound)
 	ErrorEmailAlreadyUsed = NewError(ErrEmailAlreadyUsed.Error(), "40901", http.StatusConflict)
