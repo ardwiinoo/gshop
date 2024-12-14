@@ -12,6 +12,32 @@ type repository struct {
 	db *sqlx.DB
 }
 
+// GetTransactionsByUserPublicID implements Repository.
+func (r repository) GetTransactionsByUserPublicID(ctx context.Context, userPublicID string) (trxs []Transaction, err error) {
+	query := `
+		SELECT
+			id, user_public_id, product_id, product_price,
+			amount, sub_total, platform_fee,
+			grand_total, status, product_snapshot,
+			created_at, updated_at
+		FROM transactions
+		WHERE user_public_id=$1
+	`
+
+	err = r.db.SelectContext(ctx, &trxs, query, userPublicID)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = response.ErrNotFound
+			return
+		}
+
+		return
+	}
+
+	return
+}
+
 func newRepository(db *sqlx.DB) repository {
 	return repository{
 		db: db,
