@@ -15,6 +15,7 @@ type Repository interface {
 
 type TransactionRepository interface {
 	CreateTransactionWithTx(ctx context.Context, tx *sqlx.Tx, trx Transaction) (err error)
+	GetTransactionsByUserPublicID(ctx context.Context, userPublicID string) (trxs []Transaction, err error)
 }
 type ProductRepository interface{
 	GetProductBySKU(ctx context.Context, productSKU string) (model Product, err error)
@@ -82,6 +83,26 @@ func (s service) CreateTransaction(ctx context.Context, req CreateTransactionReq
 
 	if err = s.repo.Commit(ctx, tx); err != nil {
 		return
+	}
+
+	return
+}
+
+func (s service) TransactionHistories(ctx context.Context, userPublicID string) (transactions []Transaction, err error) {
+	trxs, err := s.repo.GetTransactionsByUserPublicID(ctx, userPublicID)
+
+	if err != nil {
+		if err == response.ErrNotFound {
+			trxs = []Transaction{}
+			return trxs, nil
+		}
+
+		return
+	}
+
+	if len(trxs) == 0 {
+		trxs = []Transaction{}
+		return trxs, nil
 	}
 
 	return

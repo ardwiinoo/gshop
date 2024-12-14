@@ -5,6 +5,7 @@ import (
 
 	"github.com/ardwiinoo/online-shop/apps/auth"
 	"github.com/ardwiinoo/online-shop/apps/product"
+	"github.com/ardwiinoo/online-shop/apps/transaction"
 	"github.com/ardwiinoo/online-shop/external/database"
 	"github.com/ardwiinoo/online-shop/internal/config"
 	"github.com/gofiber/fiber/v2"
@@ -33,6 +34,7 @@ func main() {
 
 	auth.Init(router, db)
 	product.Init(router, db)
+	transaction.Init(router, db)
 
 	router.Listen(config.Cfg.App.Port)
 } 
