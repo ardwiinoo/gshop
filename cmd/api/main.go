@@ -7,6 +7,7 @@ import (
 	"github.com/ardwiinoo/online-shop/apps/product"
 	"github.com/ardwiinoo/online-shop/apps/transaction"
 	"github.com/ardwiinoo/online-shop/external/database"
+	infrafiber "github.com/ardwiinoo/online-shop/infra/fiber"
 	"github.com/ardwiinoo/online-shop/internal/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -31,6 +32,8 @@ func main() {
 		Prefork: true,
 		AppName: config.Cfg.App.Name,
 	})
+
+	router.Use(infrafiber.Trace())
 
 	auth.Init(router, db)
 	product.Init(router, db)
