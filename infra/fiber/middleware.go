@@ -1,14 +1,36 @@
 package infrafiber
 
 import (
+	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/ardwiinoo/online-shop/infra/response"
 	"github.com/ardwiinoo/online-shop/internal/config"
 	"github.com/ardwiinoo/online-shop/utility"
 	"github.com/gofiber/fiber/v2"
 )
+
+func Trace() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		start := time.Now()
+
+		err := ctx.Next()
+
+		end := time.Now()
+		latency := end.Sub(start)
+
+		method := ctx.Method()
+		path := ctx.Path()
+		status := ctx.Response().StatusCode()
+		ip := ctx.IP()
+
+		log.Printf("%s - %s %s %d %s", ip, method, path, status, latency)
+
+		return err
+	}
+}
 
 func CheckAuth() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
@@ -42,6 +64,28 @@ func CheckAuth() fiber.Handler {
 
 		ctx.Locals("PUBLIC_ID", publicId)
 		ctx.Locals("ROLE", role)
+
+		return ctx.Next()
+	}
+}
+
+func CheckRoles(authorizedRoles []string) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		role := fmt.Sprintf("%v", ctx.Locals("ROLE"))
+
+		isExists := false
+		for _, authauthorizedRole := range authorizedRoles {
+			if role == authauthorizedRole {
+				isExists = true
+				break
+			}
+		}
+
+		if !isExists {
+			return NewResponse(
+				WithError(response.ErrorForbiddenAccess),
+			).Send(ctx)
+		}
 
 		return ctx.Next()
 	}
